@@ -1,0 +1,24 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/app/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# 額外保險：build 產物與暫存截圖不進版控（符合全域規則：build/機密不可進版控）
+*.apk
+*.ap_
+*.dex
+*.class
+/app/release
+*.png.tmp
