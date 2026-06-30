@@ -1,3 +1,38 @@
 <resources>
+    <!-- strings.xml（改預設）— 集中所有顯示文字，方便日後改字/在地化。 -->
     <string name="app_name">ChatHub</string>
+    <string name="tagline">區域網路即時群播聊天室</string>
+
+    <!-- 首頁 -->
+    <string name="nickname_hint">輸入你的暱稱</string>
+    <string name="host_title">建立聊天室</string>
+    <string name="host_desc">在這台裝置開伺服器，讓別人連進來</string>
+    <string name="join_title">加入聊天室</string>
+    <string name="join_desc">輸入對方 IP 與埠號，連進已開的聊天室</string>
+    <string name="need_nickname">請先輸入暱稱</string>
+
+    <!-- Host 設定 -->
+    <string name="host_setup_title">建立聊天室</string>
+    <string name="local_ip_label">本機 IP（請把這個位址告訴要加入的人）</string>
+    <string name="port_hint">埠號（預設 8888）</string>
+    <string name="start_server">開始聊天室</string>
+    <string name="ip_unavailable">無法取得本機 IP（請確認已連上 Wi-Fi）</string>
+
+    <!-- Join 設定 -->
+    <string name="join_setup_title">加入聊天室</string>
+    <string name="server_ip_hint">伺服器 IP（模擬器測試填 10.0.2.2）</string>
+    <string name="connect">連線</string>
+    <string name="need_host">請輸入伺服器 IP</string>
+
+    <!-- 聊天頁 -->
+    <string name="message_hint">輸入訊息…</string>
+    <string name="send">送出</string>
+    <string name="members_title">在線成員</string>
+    <string name="close_server">關閉伺服器</string>
+    <string name="leave_room">離開聊天室</string>
+    <string name="confirm">確定</string>
+    <string name="cancel">取消</string>
+    <string name="close_server_confirm">關閉後所有人都會離開聊天室，確定關閉？</string>
+    <string name="leave_confirm">確定離開聊天室？</string>
+    <string name="server_closed">伺服器已關閉，你已離開聊天室</string>
 </resources>

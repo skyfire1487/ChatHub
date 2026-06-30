@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- 網路權限：聊天室需建立 TCP socket 連線。 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 查詢網路狀態（取得本機 IP、判斷連線環境）。 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -20,6 +26,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 以下三頁皆為 App 內部導覽，exported=false（不開放外部 App 啟動）。 -->
+        <activity
+            android:name=".ui.HostSetupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.JoinSetupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.ChatActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>

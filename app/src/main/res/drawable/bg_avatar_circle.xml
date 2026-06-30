@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  頭像底圓：純白色實心圓，實際顏色由程式用 backgroundTint 依暱稱動態設定
+  （見 AvatarUtils.colorFor + MessageAdapter）。這樣同一人到處都是同一顏色。
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/white" />
+</shape>

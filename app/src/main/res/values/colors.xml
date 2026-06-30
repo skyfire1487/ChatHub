@@ -1,5 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  colors.xml（改預設）— ChatHub 品牌色盤。
+  原 Android Studio 預設的 purple/teal 已換成「通訊感」的藍 + 青綠主題。
+  集中定義顏色，讓主題、泡泡、按鈕都引用同一組，改色只改這裡。
+-->
 <resources>
-    <color name="black">#FF000000</color>
+    <!-- 品牌主色（藍）：AppBar、自己訊息泡泡、主要按鈕。 -->
+    <color name="brand_primary">#2962FF</color>
+    <color name="brand_primary_dark">#0039CB</color>
+    <color name="brand_primary_light">#768FFF</color>
+
+    <!-- 強調色（青綠）：在線狀態、徽章等點綴。 -->
+    <color name="brand_accent">#00BFA5</color>
+
+    <!-- 危險色：關閉伺服器/離開等破壞性動作。 -->
+    <color name="danger">#E53935</color>
+
+    <!-- 中性色：背景、卡片、文字。 -->
+    <color name="bg">#F5F7FB</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="text_primary">#1A1C1E</color>
+    <color name="text_secondary">#5F6368</color>
+
+    <!-- 訊息泡泡。 -->
+    <color name="bubble_self">#2962FF</color>
+    <color name="bubble_self_text">#FFFFFF</color>
+    <color name="bubble_other">#FFFFFF</color>
+    <color name="bubble_other_text">#1A1C1E</color>
+    <color name="bubble_system">#E3E6EC</color>
+    <color name="bubble_system_text">#5F6368</color>
+
+    <!-- 連線狀態點：綠(良好)/黃(連線或重連中)/紅(斷線)。 -->
+    <color name="status_ok">#2E7D32</color>
+    <color name="status_warn">#F9A825</color>
+    <color name="status_bad">#C62828</color>
+
     <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
 </resources>

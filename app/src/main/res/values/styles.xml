@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  styles.xml（新建）— 共用元件樣式。
+  踩雷點：Material3 主題下 XML 的 <Button> 會被自動換成 MaterialButton，
+  它會「忽略 android:background 指定的自訂 drawable」。所以按鈕底色必須用 backgroundTint，
+  否則例如紅色危險鈕會被主題主色覆蓋。這裡集中定義兩種按鈕樣式供各畫面引用。
+-->
+<resources>
+    <!-- 主要動作按鈕（品牌藍）。 -->
+    <style name="AppButton.Primary" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/brand_primary</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="cornerRadius">14dp</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+    </style>
+
+    <!-- 危險動作按鈕（紅）：關閉伺服器/離開。 -->
+    <style name="AppButton.Danger" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/danger</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="cornerRadius">14dp</item>
+    </style>
+
+    <!-- 文字型按鈕（次要動作）。 -->
+    <style name="AppButton.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">@color/brand_primary</item>
+    </style>
+</resources>

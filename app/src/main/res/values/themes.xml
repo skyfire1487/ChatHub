@@ -1,8 +1,17 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!--
+      themes.xml（改預設）— 套用 ChatHub 品牌色到 Material3 主題。
+      只覆寫關鍵色彩 token（primary / surface / background），其餘沿用 Material3 預設。
+    -->
     <style name="Base.Theme.ChatHub" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorPrimaryDark">@color/brand_primary_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/brand_accent</item>
+        <item name="android:colorBackground">@color/bg</item>
+        <item name="colorSurface">@color/surface</item>
+        <!-- 狀態列用品牌深色，內容用淺色圖示。 -->
+        <item name="android:statusBarColor">@color/brand_primary</item>
     </style>
 
     <style name="Theme.ChatHub" parent="Base.Theme.ChatHub" />

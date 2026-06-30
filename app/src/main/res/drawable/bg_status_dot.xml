@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 連線狀態小圓點：底色白，實際顏色由程式依連線狀態(綠/黃/紅)用 backgroundTint 設定。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/white" />
+    <size android:width="10dp" android:height="10dp" />
+</shape>

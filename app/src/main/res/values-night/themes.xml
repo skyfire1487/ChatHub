@@ -1,7 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!--
+      values-night/themes.xml（改預設）— 深色模式下的 ChatHub 主題。
+      深色時主色用較亮的品牌藍，確保在深底上對比足夠。
+    -->
     <style name="Base.Theme.ChatHub" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/brand_primary_light</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorSecondary">@color/brand_accent</item>
+        <item name="android:statusBarColor">@color/brand_primary_dark</item>
     </style>
 </resources>

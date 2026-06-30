@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 他人訊息泡泡：白底+淺邊框、左下角收小做出「指向對方」方向感。 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/bubble_other" />
+    <stroke android:width="1dp" android:color="#E0E3E9" />
+    <corners
+        android:topLeftRadius="18dp"
+        android:topRightRadius="18dp"
+        android:bottomLeftRadius="4dp"
+        android:bottomRightRadius="18dp" />
+</shape>
