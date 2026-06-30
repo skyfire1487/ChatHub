@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.PopupMenu;
@@ -106,6 +107,7 @@ public class ChatActivity extends AppCompatActivity
         bindViews();
         setupRecyclerViews();
         setupInput();
+        setupBackHandling();
 
         // 依模式啟動網路。
         if (MODE_HOST.equals(mode)) {
@@ -372,10 +374,19 @@ public class ChatActivity extends AppCompatActivity
                 .show();
     }
 
-    /** 系統返回鍵：等同點選單離開（先確認，避免誤觸直接斷線）。 */
-    @Override
-    public void onBackPressed() {
-        confirmLeave();
+    /**
+     * 攔截系統返回鍵：先跳確認對話框，避免誤觸直接斷線。
+     * 為何用 OnBackPressedDispatcher 而非覆寫 onBackPressed()：
+     *   targetSdk 較新時啟用了「預測返回(predictive back)」，舊的 onBackPressed() 覆寫不一定會被呼叫；
+     *   註冊 OnBackPressedCallback 才是現行且不被淘汰的正確做法。
+     */
+    private void setupBackHandling() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                confirmLeave();
+            }
+        });
     }
 
     /**

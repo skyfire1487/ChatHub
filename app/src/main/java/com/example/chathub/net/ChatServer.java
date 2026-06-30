@@ -15,7 +15,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -71,6 +73,10 @@ public class ChatServer {
     private ServerSocket serverSocket;          // 監聽用 socket
     private Thread acceptThread;                // accept 迴圈執行緒
     private ScheduledExecutorService heartbeat; // 心跳排程器
+    // 專一的「送出」執行緒：所有對 socket 的寫出都丟到這裡，確保
+    // (1) 不在 UI 主執行緒做網路 IO（否則 NetworkOnMainThreadException）；
+    // (2) 所有廣播/歷史/關閉訊息序列化、順序一致（單一執行緒 FIFO）。
+    private final ExecutorService io = Executors.newSingleThreadExecutor();
 
     public ChatServer(String hostName, int port, Listener listener) {
         this.hostName = hostName;
@@ -131,20 +137,24 @@ public class ChatServer {
     public void shutdown() {
         if (!running) return;
         running = false;
-        // 1) 通知所有客戶端即將關閉。
-        broadcast(ChatProtocol.serverClosing("伺服器已關閉聊天室"));
-        // 2) 關閉每條客戶端連線。
-        for (ClientHandler h : clients) {
-            h.close();
-        }
-        clients.clear();
-        // 3) 關閉監聽 socket（會讓 accept() 解除阻塞而結束 accept 迴圈）。
-        try {
-            if (serverSocket != null) serverSocket.close();
-        } catch (IOException ignored) {}
-        // 4) 停心跳。
+        // 1) 先停心跳（不要再對即將關閉的連線送 PING）。
         if (heartbeat != null) heartbeat.shutdownNow();
-        // 5) 通知 UI。
+        // 2) 在 io 執行緒上「先廣播 SERVER_CLOSING、再關閉每條連線」：
+        //    放同一個 io 任務確保「關閉通知一定在斷線之前送出」（順序正確），
+        //    且整段在背景執行緒跑，不在 UI 主執行緒做網路 IO。
+        io.submit(() -> {
+            JSONObject closing = ChatProtocol.serverClosing("伺服器已關閉聊天室");
+            for (ClientHandler h : clients) h.send(closing);
+            for (ClientHandler h : clients) h.close();
+            clients.clear();
+            // 關閉監聽 socket（會讓 accept() 解除阻塞而結束 accept 迴圈）。
+            try {
+                if (serverSocket != null) serverSocket.close();
+            } catch (IOException ignored) {}
+        });
+        // 3) 讓 io 跑完上面已排入的關閉任務後終止（不再接受新任務）。
+        io.shutdown();
+        // 4) 通知 UI。
         post(listener::onStopped);
     }
 
@@ -233,10 +243,26 @@ public class ChatServer {
 
     // ── 廣播 / 成員 / 歷史 的小工具 ────────────────────────────────────────
 
-    /** 把一則訊息送給「所有」已連線客戶端（fan-out 的實作核心）。 */
+    /**
+     * 把一則訊息送給「所有」已連線客戶端（fan-out 的實作核心）。
+     * 實際寫出丟到 io 執行緒：呼叫端可能是 UI 主執行緒（Host 發話/打字）或背景執行緒，
+     * 統一交給 io 序列化送出，既不會在主執行緒做網路 IO，也保證廣播順序一致。
+     */
     private void broadcast(JSONObject json) {
-        for (ClientHandler h : clients) {
-            h.send(json);
+        enqueue(() -> {
+            for (ClientHandler h : clients) {
+                h.send(json);
+            }
+        });
+    }
+
+    /** 把送出工作排入 io 執行緒；若 io 已在關閉流程中則安靜略過。 */
+    private void enqueue(Runnable task) {
+        if (io.isShutdown()) return;
+        try {
+            io.submit(task);
+        } catch (RejectedExecutionException ignored) {
+            // 正在關閉，丟棄這次送出即可。
         }
     }
 
@@ -279,9 +305,12 @@ public class ChatServer {
         synchronized (history) {
             snapshot = new ArrayList<>(history); // 複製一份再送，縮短鎖定時間
         }
-        for (JSONObject json : snapshot) {
-            handler.send(json);
-        }
+        // 同樣經 io 序列化送出，確保「歷史」一定排在後續的 roster/system 之前。
+        enqueue(() -> {
+            for (JSONObject json : snapshot) {
+                handler.send(json);
+            }
+        });
     }
 
     /** 把工作丟回主執行緒執行（所有 UI 回呼統一走這裡）。 */
