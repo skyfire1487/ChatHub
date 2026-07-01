@@ -1,6 +1,7 @@
 # CLAUDE.md — ChatHub 專案上手指南（給 AI Agent 與開發者）
 
 > 讓任何 AI Agent 或新進開發者**快速、正確**理解本專案。
+> 新手領域知識入門見 [Docs/CONCEPTS.md](Docs/CONCEPTS.md)（Socket/loopback/TCP/埠/NAT/執行緒/心跳白話講解）；
 > 人類導向逐步教學見 [Docs/TEACHING.md](Docs/TEACHING.md)；協定規格見 [Docs/PROTOCOL.md](Docs/PROTOCOL.md)；功能總覽見 [README.md](README.md)。
 
 ## 1. 這是什麼

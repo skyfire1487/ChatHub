@@ -40,6 +40,7 @@ $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
 .\gradlew.bat :app:assembleDebug --console=plain   # 需看到 BUILD SUCCESSFUL
 ```
 
+**完全新手先讀 [Docs/CONCEPTS.md](Docs/CONCEPTS.md)** — 白話介紹 Socket、loopback、TCP、埠、NAT、執行緒、心跳等領域知識，並對應到程式位置。
 兩台模擬器互連、完整操作與錯誤排查見 **[Docs/TEACHING.md](Docs/TEACHING.md)**。
 通訊協定規格見 **[Docs/PROTOCOL.md](Docs/PROTOCOL.md)**。
 

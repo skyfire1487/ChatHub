@@ -1,7 +1,8 @@
 # ChatHub 教學文件（從零跑通 + 程式講解 + 錯誤排查）
 
 > 這份文件讓沒參與開發的人也能**自己跑通、看懂、接手**這個專案。
-> 協定規格另見 [PROTOCOL.md](PROTOCOL.md)；功能總覽見 [../README.md](../README.md)。
+> **完全新手請先讀 [CONCEPTS.md](CONCEPTS.md)**（用白話 + 生活比喻介紹 Socket、loopback、TCP、埠、NAT、執行緒、心跳等領域知識）。
+> 協定規格見 [PROTOCOL.md](PROTOCOL.md)；功能總覽見 [../README.md](../README.md)。
 
 ---
 
