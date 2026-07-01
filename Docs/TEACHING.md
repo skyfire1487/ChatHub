@@ -115,6 +115,15 @@ $adb = "C:\Users\User\AppData\Local\Android\Sdk\platform-tools\adb.exe"
 & $adb -s emulator-5554 forward tcp:8888 tcp:8888
 ```
 
+> **懶人一鍵版**：上面的第 3、4 步（裝 APK 到所有模擬器 + 對 Host 設 forward）已包成腳本，
+> 建置完 APK 後直接執行即可（`emulator-5554` 換成你要當 Host 的那台序號）：
+>
+> ```powershell
+> scripts\emu_connect.bat emulator-5554 8888
+> ```
+>
+> 註：`.bat` 內容刻意用純英文（cmd 讀 `.bat` 是系統 ANSI 編碼，含中文會亂碼閃退，這是本機踩過的雷）。
+
 ### 階段 C — 在 App 裡操作
 
 **Host（emulator-5554）**

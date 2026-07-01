@@ -236,6 +236,20 @@ public class ChatActivity extends AppCompatActivity
     public void onRoster(List<String> memberNames) {
         memberAdapter.setMembers(memberNames);
         tvOnlineCount.setText(String.valueOf(memberNames.size()));
+        // 清掉「已經不在成員清單裡卻還卡在打字中」的人：
+        // 若某人正在打字時斷線，他的 typing(false) 不會送達，會殘留「X 正在輸入…」。
+        // 每次成員更新時，把不在清單裡的打字者移除（roster 名稱可能帶「（主持）」後綴，故用寬鬆比對）。
+        if (typingUsers.removeIf(typer -> !rosterContains(memberNames, typer))) {
+            refreshTyping();
+        }
+    }
+
+    /** 寬鬆判斷某暱稱是否還在成員清單：完全相等，或成員名以「暱稱（」開頭（Host 顯示為「暱稱（主持）」）。 */
+    private boolean rosterContains(List<String> members, String name) {
+        for (String m : members) {
+            if (m.equals(name) || m.startsWith(name + "（")) return true;
+        }
+        return false;
     }
 
     @Override

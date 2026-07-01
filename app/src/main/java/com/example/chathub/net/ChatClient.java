@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -97,6 +98,9 @@ public class ChatClient {
     public void leave() {
         active = false;
         closeSocket();
+        // 中斷管理執行緒：若它正卡在重連退避的 sleep()，interrupt 會讓它立即醒來、
+        // 看到 active=false 而收尾，不用乾等最多 15 秒（sleep 內會捕捉 InterruptedException）。
+        if (managerThread != null) managerThread.interrupt();
         if (pinger != null) pinger.shutdownNow();
         sender.shutdownNow();
         post(() -> listener.onState(ConnectionState.DISCONNECTED));
@@ -252,7 +256,11 @@ public class ChatClient {
     /** 把送出工作丟到 sender 執行緒序列化執行。 */
     private void send(JSONObject json) {
         if (sender.isShutdown()) return;
-        sender.submit(() -> rawWrite(json));
+        try {
+            sender.submit(() -> rawWrite(json));
+        } catch (RejectedExecutionException ignored) {
+            // 剛好在檢查後、submit 前被 leave() 關掉：丟棄這次送出即可，不需報錯。
+        }
     }
 
     /**
