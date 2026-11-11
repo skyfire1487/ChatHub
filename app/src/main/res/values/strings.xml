@@ -13,7 +13,8 @@
 
     <!-- Host 設定 -->
     <string name="host_setup_title">建立聊天室</string>
-    <string name="local_ip_label">本機 IP（請把這個位址告訴要加入的人）</string>
+    <string name="local_ip_label">本機 IP（真機同 Wi-Fi 時，把這個位址告訴要加入的人）</string>
+    <string name="host_emulator_hint">※ 兩台模擬器互連：加入端請改填 10.0.2.2，並先在電腦執行 adb forward（或 scripts\\emu_connect.bat）。上面的 10.0.2.x 是模擬器對內位址，別台模擬器連不到。</string>
     <string name="port_hint">埠號（預設 8888）</string>
     <string name="start_server">開始聊天室</string>
     <string name="ip_unavailable">無法取得本機 IP（請確認已連上 Wi-Fi）</string>

@@ -10,6 +10,24 @@
 |---|---|---|
 | ![home](Docs/screenshots/01_home.png) | ![host](Docs/screenshots/04_host_chat.png) | ![client](Docs/screenshots/05_client_chat.png) |
 
+## Host / Client 設定
+
+Host 會顯示聊天室的 IP 與埠號；Client 輸入同一組位址即可加入。兩台真機請連上同一個 Wi-Fi，並使用 Host 顯示的區網 IP。
+
+| Host 顯示可供連線的位址 | Client 輸入 Host 位址 |
+|---|---|
+| ![Host 設定頁](Docs/screenshots/02_host_setup.png) | ![Client 加入設定頁](Docs/screenshots/03_join_setup.png) |
+
+兩台 Android 模擬器在同一台電腦上互連時，先執行 `scripts\emu_connect.bat <HOST_SERIAL> [PORT]` 設定 port forwarding，再於 Client 填入 `10.0.2.2`；完整步驟見 [Docs/TEACHING.md](Docs/TEACHING.md)。
+
+## 正常離開與關閉
+
+Client 離開後，Host 會即時更新成員名單；Host 關閉聊天室時，Client 會顯示伺服器已關閉並平順離開。
+
+| Client 離開後的 Host 名單 | Host 關閉後的 Client 畫面 |
+|---|---|
+| ![Host 成員名單更新](Docs/screenshots/06_host_member_left.png) | ![Client 顯示伺服器已關閉](Docs/screenshots/07_server_closed.png) |
+
 ## 功能
 
 **核心（對應原 Socket 聊天室作業）**
