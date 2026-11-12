@@ -27,22 +27,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * ChatClient —「聊天室客戶端」核心（新建，Socket 核心檔）。
- *
- * 解決什麼問題：
- *   Join 端要主動連到 Host 的 ServerSocket，連上後：自報暱稱(JOIN)、持續讀伺服器送來的訊息、
- *   把使用者輸入送出去、用心跳量延遲(RTT)、斷線時自動重連。這支封裝這整套客戶端行為。
- *
- * 在 Socket 流程的位置（面試主線）：
- *   new Socket().connect(host:port) → 取得 in/out 串流 → 送 JOIN → 起讀執行緒 readLine() 迴圈
- *   → 收到 MSG/ROSTER/SYSTEM 就回呼 UI 顯示；收到 PING 回 PONG；收到自己 PING 的 PONG 算 RTT
- *   → 連線中斷則指數退避自動重連；收到 SERVER_CLOSING 則停止重連、通知 UI 優雅離開。
- *
- * 並發模型：
- *   - 1 條「管理執行緒」負責 連線→讀迴圈→(斷線)→等待→重連 的整個循環。
- *   - 送出走專一的 sender 執行緒（避免在 UI 主執行緒做網路 IO，會丟 NetworkOnMainThreadException）。
- *   - 1 個排程器做客戶端心跳（量 RTT 兼保活）。
- *   所有 UI 回呼都用主執行緒 Handler 轉送。
+ * 管理 Client TCP 連線、協定訊息、心跳與自動重連。
  */
 public class ChatClient {
 
@@ -91,9 +76,9 @@ public class ChatClient {
 
     /**
      * 使用者主動離開聊天室。
-     * 在幹嘛：把 active 設 false（停止重連），關閉 socket（解除 readLine 阻塞），停心跳與 sender。
+     * 處理方式：把 active 設 false（停止重連），關閉 socket（解除 readLine 阻塞），停心跳與 sender。
      * 為何這樣：正常離開時 socket 一關，伺服器端 readLine() 會收到 null → 伺服器把我移出成員清單
-     *          並廣播「X 離開」（對應原作業：Client 離開後成員名單更新正常）。
+     *          並廣播離開事件，使在線成員狀態保持同步。
      */
     public void leave() {
         active = false;

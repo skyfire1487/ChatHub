@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  styles.xml（新建）— 共用元件樣式。
-  踩雷點：Material3 主題下 XML 的 <Button> 會被自動換成 MaterialButton，
+  共用按鈕元件樣式。
+  相容性：Material 3 主題下 XML 的 <Button> 會套用 MaterialButton，
   它會「忽略 android:background 指定的自訂 drawable」。所以按鈕底色必須用 backgroundTint，
   否則例如紅色危險鈕會被主題主色覆蓋。這裡集中定義兩種按鈕樣式供各畫面引用。
 -->

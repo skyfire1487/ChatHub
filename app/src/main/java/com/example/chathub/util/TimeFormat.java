@@ -6,14 +6,7 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
- * TimeFormat —「時間格式化」工具（新建）。
- *
- * 解決什麼問題：
- *   訊息要顯示「幾點幾分」，日期分隔要顯示「今天/昨天/月日」。把格式化集中一處，
- *   避免每個 Adapter 各自 new SimpleDateFormat 造成不一致或重複建立。
- * 為何用 SimpleDateFormat 而非 java.time：
- *   本專案 minSdk=25，java.time（LocalDateTime 等）要 API 26+ 才保證可用，
- *   為相容低版本一律用 SimpleDateFormat（沿用 AgendaTracker 既有踩雷結論）。
+ * 將時間戳格式化為訊息時間與日期分組標籤。
  */
 public final class TimeFormat {
 
@@ -32,7 +25,7 @@ public final class TimeFormat {
 
     /**
      * 給「日期分隔列」用的標籤：今天 / 昨天 / M月d日。
-     * 在幹嘛：把某則訊息的時間戳換成人看得懂的日期分組標籤，讓聊天串依日期分段。
+     * 處理方式：把某則訊息的時間戳換成人看得懂的日期分組標籤，讓聊天串依日期分段。
      */
     public static String dayLabel(long ts) {
         Calendar target = dayStart(ts);                       // 該訊息所屬「那一天」的 00:00

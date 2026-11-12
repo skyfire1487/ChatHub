@@ -14,21 +14,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
 /**
- * ClientHandler —「伺服器端，對應單一已連線客戶端」的處理器（新建，Socket 核心檔）。
- *
- * 解決什麼問題：
- *   ServerSocket.accept() 每接到一個客戶端，就會得到一條代表「這條連線」的 Socket。
- *   每條連線都需要一條獨立的執行緒持續讀它說的話（因為 readLine() 會阻塞），
- *   並提供一個能把訊息「寫回給這個客戶端」的方法。這支就是「一條連線 = 一個 ClientHandler + 一條讀執行緒」。
- *
- * 在整個 Socket 流程的位置（面試要會講）：
- *   ServerSocket.accept() → new ClientHandler(socket) → 起讀執行緒 readLine() 迴圈
- *   → 把每一行 JSON 交給 ChatServer 處理（轉廣播/更新成員）。
- *
- * 並發/關閉重點：
- *   - 讀在自己的執行緒；寫可能來自「廣播」（別條執行緒），所以寫出要用 writeLock 同步，避免兩則訊息交錯。
- *   - readLine() 回傳 null = 對端關閉了連線；這是「正常事件」，要當作離線處理，不可當例外崩潰。
- *   - 串流關閉用集中的 closeQuietly（finally 一定會關），不在中途手動逐一 close，避免例外時漏關造成洩漏。
+ * 處理一條已接受 TCP 連線的訊息讀取、事件派發與送出。
  */
 public class ClientHandler implements Runnable {
 
@@ -71,8 +57,8 @@ public class ClientHandler implements Runnable {
 
     /**
      * 讀迴圈（在自己的執行緒上跑）。
-     * 在幹嘛：不斷 readLine() 讀客戶端送來的每一行，交給 handleLine() 派發，直到對端關閉或出錯。
-     * 為何包在 try/finally：不論正常結束(null)或 IOException，finally 都會關連線並通知伺服器移除此成員，
+     * 處理方式：不斷 readLine() 讀客戶端送來的每一行，交給 handleLine() 派發，直到對端關閉或出錯。
+     * 資源管理：不論正常結束(null)或 IOException，finally 都會關連線並通知伺服器移除此成員，
      *                      確保成員清單與資源一定被清理（優雅關閉的關鍵）。
      */
     @Override
@@ -136,7 +122,7 @@ public class ClientHandler implements Runnable {
                 break;
 
             case ChatProtocol.TYPE_PONG:
-                // 客戶端回應我們的心跳：lastSeenMs 已在上面更新，這裡不需額外動作。
+                // Client 回應伺服器心跳時，lastSeenMs 已更新，無需額外處理。
                 break;
 
             default:
@@ -147,7 +133,7 @@ public class ClientHandler implements Runnable {
 
     /**
      * 把一則 JSON 訊息寫回這個客戶端。
-     * 在幹嘛：序列化成單行 JSON、補上 '\n' 當分幀邊界、flush 立即送出。
+     * 處理方式：序列化成單行 JSON、補上 '\n' 當分幀邊界、flush 立即送出。
      * 為何 synchronized(writeLock)：廣播時多條執行緒可能同時寫同一個 out，
      *   不同步會讓兩則訊息的字元交錯、毀掉分幀。鎖住確保「一則寫完才換下一則」。
      * 寫失敗的處理：通常代表連線已斷，關閉並讓伺服器移除此成員。

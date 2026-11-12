@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  item_message_other.xml（新建）— 他人訊息：靠左，左側首字色塊頭像，右側為暱稱 + 白泡泡(內文+時間)。
+  他人訊息：靠左，左側首字色塊頭像，右側為暱稱 + 白泡泡(內文+時間)。
   頭像底圓顏色與暱稱由程式依 AvatarUtils 動態設定。
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"

@@ -22,26 +22,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * ChatServer —「聊天室伺服器」核心（新建，Socket 核心檔）。
- *
- * 解決什麼問題：
- *   Host 端要開一個 ServerSocket 監聽埠，接受多個客戶端連線，並負責「把任一個人說的話
- *   廣播給所有人」「維護在線成員清單」「心跳偵測掉線」「優雅關閉不讓客戶端報錯」。
- *   這支就是這整套伺服器邏輯的中樞；每條連線的「讀」交給各自的 ClientHandler。
- *
- * 整個 Socket 生命週期（面試主線，從這裡看最清楚）：
- *   start() 開 ServerSocket → accept() 迴圈每接到一個 Socket 就建一個 ClientHandler 起讀執行緒
- *   → 客戶端送 JOIN，登錄成員、廣播 ROSTER+系統訊息、補歷史
- *   → 任何人送 MSG，伺服器廣播給所有連線（fan-out）
- *   → 定時 PING 心跳，逾時沒回應就移除該成員
- *   → shutdown() 廣播 SERVER_CLOSING、關閉所有連線與 ServerSocket。
- *
- * 並發模型：
- *   - 1 條 accept 執行緒（阻塞在 accept()）。
- *   - 每個客戶端 1 條讀執行緒（ClientHandler）。
- *   - 1 個排程器跑心跳。
- *   成員清單用 CopyOnWriteArrayList（讀多寫少、遍歷時不怕別執行緒在改，廣播很安全）。
- *   所有「給 UI 的回呼」都用主執行緒 Handler 轉送，Activity 端不必再自己 runOnUiThread。
+ * 管理 Host TCP 監聽、Client 連線、事件廣播、名單同步及心跳。
  */
 public class ChatServer {
 
@@ -129,10 +110,10 @@ public class ChatServer {
 
     /**
      * 優雅關閉伺服器。
-     * 在幹嘛：先廣播 SERVER_CLOSING 通知客戶端「我要關了，請自行收尾」，
+     * 處理方式：先廣播 SERVER_CLOSING 通知客戶端「我要關了，請自行收尾」，
      *        再關閉每條客戶端連線與 ServerSocket，停掉心跳。
      * 為何先廣播再關：讓客戶端「先知道是正常關閉」再斷線，這樣對端 readLine() 收 null 時
-     *               能顯示「伺服器已關閉」而不是當成異常錯誤（對應原作業：關閉不可報錯）。
+     *               Client 可識別為伺服器關閉事件，而非一般連線錯誤。
      */
     public void shutdown() {
         if (!running) return;

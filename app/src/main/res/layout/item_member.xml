@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- item_member.xml（新建）— 在線成員列：首字色塊頭像 + 暱稱 + 在線綠點。 -->
+<!-- 在線成員列：首字色塊頭像 + 暱稱 + 在線綠點。 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

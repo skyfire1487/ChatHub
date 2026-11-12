@@ -38,18 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * ChatActivity —「聊天主畫面」，Host 與 Client 共用（新建，核心 UI）。
- *
- * 解決什麼問題：
- *   這頁同時負責「網路生命週期」與「畫面呈現」：依進來的 mode 決定要開伺服器(ChatServer)
- *   還是當客戶端(ChatClient)，並把網路層回呼來的事件畫到畫面上（訊息、成員、打字中、連線狀態、RTT）。
- *
- * 為何同時 implements 兩個 Listener：
- *   ChatServer.Listener 與 ChatClient.Listener 有四個同名回呼（onMessage/onSystem/onRoster/onTyping），
- *   共用同一份實作即可；其餘各自獨有的回呼在另一模式下不會被呼叫。這樣 Host/Client 共用大部分 UI 邏輯。
- *
- * 執行緒：網路層所有回呼都已切回「主執行緒」（ChatServer/ChatClient 內用 Handler 轉送），
- *        所以這裡可以直接更新 UI，不需再 runOnUiThread。
+ * 呈現 Host 與 Client 共用聊天室，連接網路事件與聊天介面。
  */
 public class ChatActivity extends AppCompatActivity
         implements ChatServer.Listener, ChatClient.Listener {
@@ -285,7 +274,7 @@ public class ChatActivity extends AppCompatActivity
 
     @Override
     public void onStopped() {
-        // 伺服器已關閉（由我們自己觸發 shutdown），結束本頁。
+        // 收到 Host 關閉流程的通知後結束聊天室頁面。
         finish();
     }
 
@@ -317,7 +306,7 @@ public class ChatActivity extends AppCompatActivity
 
     @Override
     public void onServerClosing(String reason) {
-        // 伺服器正常關閉：這是「正常事件」不是錯誤，提示後離開（對應原作業：關閉不報錯）。
+        // 收到伺服器正常關閉通知後提示狀態並離開聊天室。
         new AlertDialog.Builder(this)
                 .setTitle("聊天室已關閉")
                 .setMessage(getString(R.string.server_closed))

@@ -16,11 +16,7 @@ import com.example.chathub.R;
 import com.example.chathub.util.NetworkUtils;
 
 /**
- * JoinSetupActivity —「加入聊天室前的設定頁」（新建）。
- *
- * 解決什麼問題：
- *   Join 端需要輸入「要連的伺服器 IP + 埠號」。設定好後帶 mode=CLIENT 進 ChatActivity 連線。
- *   模擬器測試時 IP 預設填 10.0.2.2（配合 adb forward，把開發機埠轉給 Server 模擬器）。
+ * 收集 Client 連線所需的 Host 位址與埠號。
  */
 public class JoinSetupActivity extends AppCompatActivity {
 

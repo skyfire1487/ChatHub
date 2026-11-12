@@ -16,11 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * MemberAdapter —「在線成員清單」轉接器（新建）。
- *
- * 解決什麼問題：
- *   把伺服器推來的成員名稱清單顯示成一列列「頭像 + 暱稱 + 在線綠點」。
- *   每次收到新的 ROSTER 就整批替換（成員不多，直接 setMembers + notifyDataSetChanged 最單純）。
+ * 將聊天室成員清單綁定至畫面。
  */
 public class MemberAdapter extends RecyclerView.Adapter<MemberAdapter.VH> {
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  activity_join_setup.xml（新建）— 加入聊天室前的設定頁。
+  加入聊天室前的設定頁。
   root id="joinSetupRoot"：供 Activity 套 WindowInsets padding。
   輸入伺服器 IP 與埠號後連線（模擬器測試填 10.0.2.2）。
 -->

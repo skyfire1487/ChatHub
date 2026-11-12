@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  activity_chat.xml（新建）— 聊天主畫面（Host / Client 共用）。
+  聊天主畫面（Host / Client 共用）。
   root id="chatRoot"：供 ChatActivity 套 WindowInsets padding（頂部 bar 不被狀態列蓋住）。
   由上而下：自訂 AppBar（標題/副標/在線徽章/狀態點/選單）→ 連線狀態 banner →
             在線成員面板(可收合) → 訊息清單 → 打字中提示 → 輸入列。

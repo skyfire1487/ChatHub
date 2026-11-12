@@ -18,13 +18,7 @@ import com.example.chathub.ui.JoinSetupActivity;
 import com.google.android.material.card.MaterialCardView;
 
 /**
- * MainActivity —「首頁 / 角色選擇」（改預設：Android Studio 產生的進入點，內容已改寫）。
- *
- * 解決什麼問題：
- *   單一 APK 同時能當伺服器或客戶端，所以一進來先讓使用者輸入暱稱，再選「建立聊天室(Host)」
- *   或「加入聊天室(Join)」，分別導去對應的設定頁。
- *
- * 共用常數：暱稱透過 Intent extra 一路帶到後面的頁面（key 定義在 ChatActivity.EXTRA_*）。
+ * 首頁入口；收集暱稱並導向 Host 建立或 Client 加入流程。
  */
 public class MainActivity extends AppCompatActivity {
 

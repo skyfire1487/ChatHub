@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- item_message_self.xml（新建）— 自己發出的訊息：整列靠右、藍泡泡、泡泡內含內文與時間。 -->
+<!-- 自己發出的訊息：整列靠右、藍泡泡、泡泡內含內文與時間。 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

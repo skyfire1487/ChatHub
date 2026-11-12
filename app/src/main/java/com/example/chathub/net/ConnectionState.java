@@ -1,13 +1,7 @@
 package com.example.chathub.net;
 
 /**
- * ConnectionState —「客戶端連線狀態」列舉（新建，加值 A 12）。
- *
- * 解決什麼問題：
- *   客戶端不是只有「連上/沒連上」兩種，還有「連線中」「重連中」「已斷線」。把這些狀態
- *   收成一個列舉，UI 的狀態 banner 就能依狀態切顏色與文字（綠/黃/紅），邏輯清楚不易亂。
- * 為何用 enum：
- *   狀態是「有限且互斥」的集合，enum 最貼切；附帶中文標籤方便 UI 直接顯示。
+ * 描述 Client 連線與重連狀態，並提供 UI 顯示標籤。
  */
 public enum ConnectionState {
 

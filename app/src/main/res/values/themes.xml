@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!--
-      themes.xml（改預設）— 套用 ChatHub 品牌色到 Material3 主題。
+      ChatHub Material 3 主題。
       只覆寫關鍵色彩 token（primary / surface / background），其餘沿用 Material3 預設。
     -->
     <style name="Base.Theme.ChatHub" parent="Theme.Material3.DayNight.NoActionBar">

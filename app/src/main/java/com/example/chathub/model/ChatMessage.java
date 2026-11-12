@@ -1,17 +1,7 @@
 package com.example.chathub.model;
 
 /**
- * ChatMessage —「聊天頁要顯示的一則內容」UI 資料模型（新建）。
- *
- * 解決什麼問題：
- *   網路層收到的是「協定封包（帶 type 的 JSON）」，但畫面上要顯示的只是三種泡泡：
- *   自己說的、別人說的、系統訊息。這個模型把「要怎麼畫」需要的欄位收斂起來，
- *   讓 RecyclerView 的 Adapter 只依賴它，不必認識網路協定細節（關注點分離）。
- * 輸入 / 輸出：
- *   由 Activity 在收到網路回呼後建立；Adapter 讀 kind/name/body/timestamp 來決定版型與內容。
- * 為何這樣寫：
- *   把「傳輸用的協定物件」與「顯示用的 UI 物件」分開，是讓「整個 Socket 流程好解釋」的關鍵——
- *   網路層只管收送 JSON，UI 層只管畫泡泡，兩者用這個簡單模型銜接。
+ * 聊天訊息與系統事件的呈現資料模型。
  */
 public class ChatMessage {
 

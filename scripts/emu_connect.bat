@@ -17,7 +17,7 @@ REM  It (1) installs the debug APK to ALL connected devices and
 REM     (2) sets "adb forward tcp:<PORT>" on the HOST emulator.
 REM  Then: HOST picks "Create room" on that port; the other
 REM  emulator picks "Join", IP = 10.0.2.2, same port.
-REM  (Full Chinese guide: Docs\TEACHING.md section 3)
+REM  (Full Chinese guide: Docs\OPERATIONS.md section 3)
 REM ============================================================
 
 REM Locate adb: prefer default SDK path, fall back to PATH.

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  colors.xml（改預設）— ChatHub 品牌色盤。
-  原 Android Studio 預設的 purple/teal 已換成「通訊感」的藍 + 青綠主題。
+  ChatHub 品牌色盤，供主題、訊息泡泡與互動元件共用。
   集中定義顏色，讓主題、泡泡、按鈕都引用同一組，改色只改這裡。
 -->
 <resources>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  activity_main.xml（改預設）— 首頁 / 角色選擇。
+  首頁與角色選擇畫面。
   保留 root id="main"：MainActivity 用它套 WindowInsets padding（避免被系統列/瀏海切到）。
   內容：標題+標語、暱稱輸入、兩張卡片（建立聊天室 / 加入聊天室）。
 -->

@@ -1,5 +1,5 @@
 <resources>
-    <!-- strings.xml（改預設）— 集中所有顯示文字，方便日後改字/在地化。 -->
+    <!-- 集中管理 App 顯示文字與在地化資源。 -->
     <string name="app_name">ChatHub</string>
     <string name="tagline">區域網路即時群播聊天室</string>
 

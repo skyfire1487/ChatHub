@@ -18,15 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * MessageAdapter —「聊天訊息清單」轉接器（新建）。
- *
- * 解決什麼問題：
- *   把一串 ChatMessage 餵給 RecyclerView 顯示，並依每則的型別（自己/他人/系統）套用不同版型。
- *   這是「多 view type」的標準寫法：getItemViewType 回不同型別 → onCreateViewHolder 充氣對應 layout。
- *
- * 為何把三種泡泡拆成三個 ViewHolder：
- *   三種版型差異大（靠左/靠右/置中、有無頭像與暱稱），各自一個 VH 最清楚，
- *   onBindViewHolder 依型別分派，避免一個 VH 塞滿 if 判斷。
+ * 將訊息資料綁定至本機訊息、其他成員訊息及系統事件版型。
  */
 public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

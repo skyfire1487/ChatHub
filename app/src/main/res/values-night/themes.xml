@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!--
-      values-night/themes.xml（改預設）— 深色模式下的 ChatHub 主題。
+      ChatHub 深色主題。
       深色時主色用較亮的品牌藍，確保在深底上對比足夠。
     -->
     <style name="Base.Theme.ChatHub" parent="Theme.Material3.DayNight.NoActionBar">

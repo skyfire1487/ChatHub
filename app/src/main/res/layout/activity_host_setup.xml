@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  activity_host_setup.xml（新建）— 建立聊天室前的設定頁。
+  建立聊天室前的設定頁。
   root id="hostSetupRoot"：供 Activity 套 WindowInsets padding。
   顯示本機 IP（要加入的人需知道），讓使用者設定埠號，按鈕進入聊天室。
 -->

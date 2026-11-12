@@ -1,81 +1,102 @@
-# ChatHub — Android 即時群播通訊系統
+# ChatHub — Android 區域網路即時通訊
 
-> 在 Android 上以**原生 TCP Socket** 自建一套 **JSON 應用層協定**的即時群播聊天系統，
-> 具**多執行緒並發**、**在線狀態（presence）管理**與**心跳保活**。
-> 刻意不使用 WebSocket / Socket.IO / Firebase，凸顯底層網路與並發能力。
+ChatHub 是一款以 Java 開發的 Android 區域網路群組即時通訊應用。單一 APK 可於 Host 或 Client 模式運作，透過區域網路即時交換訊息。通訊核心採用原生 TCP Socket 與自訂 JSON 協定，整合連線管理、成員狀態同步、訊息廣播、心跳量測及連線生命週期處理。
 
-單一 APK 同時能當**伺服器（Host）**或**客戶端（Client）**：進來輸入暱稱、選「建立聊天室」或「加入聊天室」。
+系統將 Android UI、網路服務與應用層協定分層，分別處理互動呈現、Socket 傳輸與訊息格式，並為連線狀態與功能模組提供清楚的實作邊界。
 
-| 首頁（選角色） | Host 聊天 | Client 聊天（顯示 RTT） |
+## 產品畫面
+
+| 角色選擇 | Host 聊天室 | Client 聊天室與 RTT |
 |---|---|---|
-| ![home](Docs/screenshots/01_home.png) | ![host](Docs/screenshots/04_host_chat.png) | ![client](Docs/screenshots/05_client_chat.png) |
+| ![ChatHub 角色選擇畫面](Docs/screenshots/01_home.png) | ![Host 聊天畫面](Docs/screenshots/04_host_chat.png) | ![Client 聊天畫面與 RTT](Docs/screenshots/05_client_chat.png) |
 
-## Host / Client 設定
-
-Host 會顯示聊天室的 IP 與埠號；Client 輸入同一組位址即可加入。兩台真機請連上同一個 Wi-Fi，並使用 Host 顯示的區網 IP。
-
-| Host 顯示可供連線的位址 | Client 輸入 Host 位址 |
+| Host 連線資訊 | Client 連線設定 |
 |---|---|
-| ![Host 設定頁](Docs/screenshots/02_host_setup.png) | ![Client 加入設定頁](Docs/screenshots/03_join_setup.png) |
+| ![Host IP 與埠號設定](Docs/screenshots/02_host_setup.png) | ![Client IP 與埠號設定](Docs/screenshots/03_join_setup.png) |
 
-兩台 Android 模擬器在同一台電腦上互連時，先執行 `scripts\emu_connect.bat <HOST_SERIAL> [PORT]` 設定 port forwarding，再於 Client 填入 `10.0.2.2`；完整步驟見 [Docs/TEACHING.md](Docs/TEACHING.md)。
-
-## 正常離開與關閉
-
-Client 離開後，Host 會即時更新成員名單；Host 關閉聊天室時，Client 會顯示伺服器已關閉並平順離開。
-
-| Client 離開後的 Host 名單 | Host 關閉後的 Client 畫面 |
+| Client 離開後的成員狀態 | Host 關閉後的 Client 狀態 |
 |---|---|
-| ![Host 成員名單更新](Docs/screenshots/06_host_member_left.png) | ![Client 顯示伺服器已關閉](Docs/screenshots/07_server_closed.png) |
+| ![成員離開後 Host 名單更新](Docs/screenshots/06_host_member_left.png) | ![伺服器關閉後 Client 的狀態](Docs/screenshots/07_server_closed.png) |
 
-## 功能
+## 功能與工程設計
 
-**核心（對應原 Socket 聊天室作業）**
-- Android `ServerSocket` 多人連線、每連線一條讀執行緒
-- 自訂 JSON 協定 + newline 分幀
-- 在線成員清單（presence）、加入/離開系統訊息
-- 訊息廣播（fan-out），自己/他人/系統三型別泡泡、暱稱頭像、時間戳
-- 顯示本機 Server IP/埠
-- **優雅關閉**：Client 離開→成員表更新不報錯；Host 關伺服器→Client 顯示「已關閉」不崩潰
+- **Host／Client 雙角色**：同一個 Android App 可建立聊天室，也可輸入伺服器位址加入。
+- **TCP 多連線服務**：Host 使用 `ServerSocket` 接受多個 Client 連線，並將訊息轉送至聊天室成員。
+- **JSON 訊息協定**：以換行分幀傳送 JSON 訊息，統一處理加入、訊息、成員清單、打字狀態、心跳與伺服器關閉等事件。
+- **即時成員狀態**：連線、離開與名單更新都會反映在聊天室畫面。
+- **連線監測與復原**：`PING/PONG` 心跳用於存活偵測與 RTT 估算；連線中斷時以指數退避策略重連。
+- **一致的結束流程**：Client 離開時 Host 移除該連線；Host 關閉時先通知 Client，再安全終止服務。
+- **訊息呈現**：支援近期訊息補送、打字中狀態、訊息時間與成員識別。
 
-**加值亮點**
-- **心跳保活**（`PING/PONG`）：逾時自動移除死連線
-- **連線延遲（RTT）顯示**：用心跳量來回時間
-- **斷線自動重連**（指數退避）+ 連線狀態 banner / 狀態點
-- **打字中**指示
-- 加入時補送**近期訊息歷史**
+## 架構
 
-## 技術棧
+```text
+Android App
+├─ UI：角色選擇、Host／Client 設定、聊天室與成員狀態
+├─ Network：ChatServer、ClientHandler、ChatClient
+└─ Protocol：ChatProtocol（JSON 封裝、解析與 newline framing）
 
-- **語言/UI**：Java、XML layout、Material 3（不使用 Kotlin / Compose）
-- **網路**：`java.net.Socket` / `ServerSocket` 原生 TCP、`org.json` JSON、多執行緒（`Thread` + `ExecutorService`）
-- **minSdk 25 / targetSdk 36**、Gradle Kotlin DSL
-
-## 快速開始
-
-```powershell
-$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
-.\gradlew.bat :app:assembleDebug --console=plain   # 需看到 BUILD SUCCESSFUL
+Host：ServerSocket → ClientHandler → Room Broadcast
+Client：Socket ↔ JSON Lines ↔ ChatServer
 ```
 
-**完全新手先讀 [Docs/CONCEPTS.md](Docs/CONCEPTS.md)** — 白話介紹 Socket、loopback、TCP、埠、NAT、執行緒、心跳等領域知識，並對應到程式位置。
-兩台模擬器互連、完整操作與錯誤排查見 **[Docs/TEACHING.md](Docs/TEACHING.md)**。
-通訊協定規格見 **[Docs/PROTOCOL.md](Docs/PROTOCOL.md)**。
+網路 I/O 在背景執行緒處理；伺服器端為每條連線配置讀取處理程序，所有訊息依協定序列化與分幀，再由 Host 廣播給聊天室成員。
+
+## 技術規格
+
+| 項目 | 採用技術 |
+|---|---|
+| 平台 | Android，minSdk 25、compileSdk 36、targetSdk 36 |
+| 語言與介面 | Java、XML Layout、Material Components |
+| 網路 | `java.net.Socket`、`ServerSocket`、TCP、`ExecutorService` |
+| 訊息格式 | Android `org.json`、newline-delimited JSON |
+| 建置 | Gradle Kotlin DSL、Java 11 |
+
+## 建置與連線
+
+在 Android Studio 專案根目錄建置 Debug APK：
+
+```powershell
+if (-not $env:JAVA_HOME) {
+    $env:JAVA_HOME = Join-Path $env:ProgramFiles 'Android\Android Studio\jbr'
+}
+.\gradlew.bat :app:assembleDebug --console=plain
+```
+
+真機連線時，Host 與 Client 使用同一個 Wi-Fi 網路；Client 輸入 Host 設定畫面顯示的區域網路 IP 與埠號。
+
+兩台 Android 模擬器在同一台電腦上互連時，先執行：
+
+```powershell
+scripts\emu_connect.bat <HOST_SERIAL> [PORT]
+```
+
+接著在 Client 輸入 `10.0.2.2` 與相同埠號。設定細節、執行診斷與操作流程見 [執行與維護指南](Docs/OPERATIONS.md)。
+
+## 技術文件
+
+- [網路與連線架構](Docs/ARCHITECTURE.md)：TCP/IP、Socket、NAT、執行緒與 ChatHub 實作對照。
+- [執行與維護指南](Docs/OPERATIONS.md)：建置、裝置連線、操作步驟與診斷方式。
+- [JSON over TCP 協定規格](Docs/PROTOCOL.md)：訊息型別、欄位、生命週期與並發模型。
+
+## 系統範圍
+
+目前採用單一聊天室；訊息歷史保存在 Host 執行期間的記憶體中，伺服器重啟後不保留。暱稱可重複。這些範圍讓目前版本聚焦於 LAN 即時通訊、協定設計及連線管理流程。
 
 ## 專案結構
 
-```
+```text
 app/src/main/java/com/example/chathub/
-├─ MainActivity.java          首頁/角色選擇
-├─ Constants.java             設定常數
-├─ net/                       ★ Socket 核心
-│  ├─ ChatProtocol.java       協定（單一事實來源）
-│  ├─ ChatServer.java         伺服器（accept/廣播/心跳/關閉）
-│  ├─ ClientHandler.java      伺服器端單一連線
-│  ├─ ChatClient.java         客戶端（連線/讀/送/心跳/重連）
-│  └─ ConnectionState.java    連線狀態列舉
-├─ model/  ChatMessage, Member
-├─ adapter/ MessageAdapter, MemberAdapter
-├─ ui/     HostSetupActivity, JoinSetupActivity, ChatActivity
-└─ util/   NetworkUtils, TimeFormat, AvatarUtils
+├─ MainActivity.java          角色選擇與進入流程
+├─ Constants.java             網路與聊天室設定
+├─ net/
+│  ├─ ChatProtocol.java       JSON 協定
+│  ├─ ChatServer.java         連線接受、廣播、心跳與關閉
+│  ├─ ClientHandler.java      單一 Client 連線處理
+│  ├─ ChatClient.java         連線、收送、心跳與重連
+│  └─ ConnectionState.java    連線狀態模型
+├─ model/                     ChatMessage、Member
+├─ adapter/                   訊息與成員列表呈現
+├─ ui/                        Host、Client 設定與聊天室畫面
+└─ util/                      網路資訊、時間與頭像工具
 ```

@@ -7,23 +7,7 @@ import org.json.JSONObject;
 import java.util.List;
 
 /**
- * ChatProtocol —「應用層通訊協定」單一事實來源（新建，核心檔）。
- *
- * 解決什麼問題：
- *   TCP socket 本身只搬「位元組串流」，沒有「訊息」概念。聊天室要區分「這是加入、那是聊天、
- *   還是心跳」，就必須自己在 TCP 之上定義一套格式。這支把「每一種訊息長怎樣、欄位叫什麼、
- *   怎麼打包/解析」全部集中，伺服器與客戶端共用同一份定義，避免兩邊各寫各的而對不起來。
- *
- * 設計（這段是面試/教學要能講清楚的重點）：
- *   1. 每一則訊息 = 一個 JSON 物件，必含 "type" 欄位標明種類（JOIN/MSG/PING…）。
- *   2. 傳輸時「一行一則」：把 JSON 字串後面接一個 '\n' 當作訊息邊界，
- *      收端用 BufferedReader.readLine() 一次讀一整則。這就是所謂的「newline 分幀」。
- *   3. 為什麼 newline 分幀安全？因為 JSONObject.toString() 會把字串內的換行字元
- *      轉義成字面的「\n」(反斜線+n)，輸出永遠是「單一物理行」，不會有真正的換行去破壞分幀。
- *      → 我們唯一要守的規則是：送出前一律用 toString() 序列化，不要自己手拼帶換行的字串。
- *
- * 為何用 org.json：
- *   它內建於 Android（免額外依賴），符合「不引入非必要套件」的原則，且 API 簡單。
+ * 定義 ChatHub JSON 訊息型別及序列化與解析方法。
  */
 public final class ChatProtocol {
 
@@ -124,7 +108,7 @@ public final class ChatProtocol {
 
     /**
      * obj —— 共用建構器：用「鍵, 值, 鍵, 值…」的成對參數組出 JSON。
-     * 在幹嘛：把所有建構器共用的「逐欄 put」集中在這裡，順便把 JSONObject.put() 宣告的
+     * 處理方式：把所有建構器共用的「逐欄 put」集中在這裡，順便把 JSONObject.put() 宣告的
      *        checked JSONException 一次處理掉，讓上面每個建構器都能乾淨地 return（不必各自 throws）。
      * 為何能安全吞掉例外：key 與 value 都是本程式自己給的合法資料（字串/數字/布林/JSONArray），
      *        org.json 在這種情況不會丟 JSONException；萬一真的發生代表程式寫錯，用 RuntimeException 立即暴露。

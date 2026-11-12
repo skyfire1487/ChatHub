@@ -18,13 +18,7 @@ import com.example.chathub.R;
 import com.example.chathub.util.NetworkUtils;
 
 /**
- * HostSetupActivity —「建立聊天室前的設定頁」（新建）。
- *
- * 解決什麼問題：
- *   Host 開房前需要：(1) 看到自己的本機 IP（要告訴別人怎麼連）、(2) 設定埠號。
- *   設定好後把暱稱+埠號帶進 ChatActivity，由 ChatActivity 真正開伺服器。
- * 為何 IP 只在這裡「顯示」不在這裡「開伺服器」：
- *   讓 ChatActivity 統一負責網路生命週期（開/關都在同一頁），設定頁只收集輸入，職責單純。
+ * 收集 Host 建立聊天室所需埠號並顯示區域網路位址。
  */
 public class HostSetupActivity extends AppCompatActivity {
 

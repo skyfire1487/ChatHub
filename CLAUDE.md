@@ -1,32 +1,30 @@
-# CLAUDE.md — ChatHub 專案上手指南（給 AI Agent 與開發者）
+# CLAUDE.md — ChatHub 專案工程指南
 
-> 讓任何 AI Agent 或新進開發者**快速、正確**理解本專案。
-> 新手領域知識入門見 [Docs/CONCEPTS.md](Docs/CONCEPTS.md)（Socket/loopback/TCP/埠/NAT/執行緒/心跳白話講解）；
-> 人類導向逐步教學見 [Docs/TEACHING.md](Docs/TEACHING.md)；協定規格見 [Docs/PROTOCOL.md](Docs/PROTOCOL.md)；功能總覽見 [README.md](README.md)。
+> 記錄 ChatHub 的系統邊界、建置方式、模組職責與工程維護慣例。
+> 網路架構見 [Docs/ARCHITECTURE.md](Docs/ARCHITECTURE.md)；執行與診斷見 [Docs/OPERATIONS.md](Docs/OPERATIONS.md)；
+> 協定規格見 [Docs/PROTOCOL.md](Docs/PROTOCOL.md)；功能總覽見 [README.md](README.md)。
 
-## 1. 這是什麼
+## 1. 專案概述
 
-**ChatHub** — Android 區域網路即時群播聊天室（課程作業升級版，前身是暑期訓練的「Socket 聊天室」）。
-**單一 APK** 可當 Host 或 Client。刻意用**原生 TCP `Socket`/`ServerSocket` + 自訂 JSON 協定**，
-不用 WebSocket/Socket.IO/Firebase，目的是完整展示 Socket 並發通訊流程。
+**ChatHub** 是 Android 區域網路即時群組通訊應用。單一 APK 支援 Host 與 Client 角色，
+以**原生 TCP `Socket`/`ServerSocket` 與自訂 JSON 協定**處理連線生命週期、並發通訊與訊息分幀。
 
-- **技術限制（不可違反）**：Android 用 **Java**、**XML layout**；不用 Kotlin、不用 Compose。
+- **平台與語言**：Android、Java、XML layout。
 - 套件 `com.example.chathub`，minSdk 25 / compileSdk 36，Gradle Kotlin DSL（`libs.versions.toml` 版本目錄）。
 
-## 2. 怎麼跑（驗證任何改動前先讀）
+## 2. 本機建置與裝置連線（驗證改動前先讀）
 
-**建置**（此機 `JAVA_HOME` 為空，要指向 Android Studio 內建 jbr）：
+**建置**：若終端機未設定 `JAVA_HOME`，請指向 Android Studio 內建的 JBR。
 ```powershell
-$env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+if (-not $env:JAVA_HOME) {
+    $env:JAVA_HOME = Join-Path $env:ProgramFiles 'Android\Android Studio\jbr'
+}
 .\gradlew.bat :app:assembleDebug --console=plain
 ```
-**務必看到 `BUILD SUCCESSFUL`**，否則 APK 不更新、裝到模擬器是舊版（本專案踩過的雷）。
+建置結果必須顯示 `BUILD SUCCESSFUL`。未成功時不得將 APK 視為目前原始碼版本。
 
-**兩台模擬器互連（最大踩雷點）**：模擬器各在 NAT 後不能直接互連。
-Host 跑在 `emulator-5554`，要 `adb -s emulator-5554 forward tcp:8888 tcp:8888`；
-Client 連線 IP 填 **`10.0.2.2`**（模擬器看開發機的 loopback）、埠 8888。
-詳細步驟見 TEACHING.md 第 3 節。`adb` 在 `C:\Users\User\AppData\Local\Android\Sdk\platform-tools\adb.exe`。
-可用 AVD：`Client01`、`Client02`、`Pixel_9`。
+**模擬器互連**：透過 `adb forward` 將開發主機埠轉送至 Host 模擬器；Client 使用 `10.0.2.2` 與相同埠號連線。裝置序號依 `adb devices` 輸出指定，操作步驟見 [OPERATIONS.md](Docs/OPERATIONS.md) 第 3 節。
+Android SDK 路徑由 `ANDROID_HOME` 指定，`adb` 位於其 `platform-tools` 子目錄；AVD 名稱依 Android Studio Device Manager 的設定。
 
 **真機**：兩機同一 Wi-Fi，Client 填 Host 設定頁顯示的區網 IP，不需 adb forward。
 
@@ -45,7 +43,7 @@ Client: ChatActivity ── ChatClient(Socket, 讀迴圈, sender執行緒, 心�
 
 | 檔案 | 職責 |
 |---|---|
-| `MainActivity` | 首頁：暱稱 + Host/Join 角色卡片（**改預設**） |
+| `MainActivity` | 首頁：暱稱輸入與 Host/Join 角色選擇 |
 | `Constants` | 埠/心跳/逾時/退避/房間等常數 |
 | `net/ChatProtocol` | **協定單一事實來源**：型別常數 + JSON 打包/解析 |
 | `net/ChatServer` | 伺服器：accept、廣播 fan-out、roster、歷史、心跳、優雅關閉；所有寫出走單一 `io` 執行緒 |
@@ -59,10 +57,9 @@ Client: ChatActivity ── ChatClient(Socket, 讀迴圈, sender執行緒, 心�
 | `ui/HostSetupActivity`,`JoinSetupActivity` | 兩個設定頁 |
 | `util/NetworkUtils`,`TimeFormat`,`AvatarUtils` | 取本機 IP、時間格式、暱稱配色 |
 
-**設計慣例**：網路一律背景執行緒；**所有 UI 回呼都已用主執行緒 Handler 轉送**（Activity 不必再 runOnUiThread）；
-搜尋/排序類邏輯在 App 端處理。
+**工程設計約定**：網路操作使用背景執行緒；網路層以主執行緒 Handler 派送 UI 回呼；搜尋與排序在 App 端處理。
 
-## 5. 已知踩雷點（改動前必看）
+## 5. 實作約束與相容性注意事項
 
 1. **不可在 UI 主執行緒做 socket 寫出** → `NetworkOnMainThreadException`。
    伺服器端所有寫出走 `ChatServer.io` 單執行緒；客戶端走 `ChatClient.sender`。新增送出路徑時務必沿用。
@@ -81,7 +78,7 @@ Client: ChatActivity ── ChatClient(Socket, 讀迴圈, sender執行緒, 心�
 commit 前確認 `BUILD SUCCESSFUL` 且不含 build 產物（`.gitignore` 已含 `/build`、`/app/build`、`.gradle`、`local.properties`）。
 本專案**無機密**（埠非機密），故不需 `.env`。
 
-## 7. 已知限制（誠實標示）
+## 7. 當前功能邊界
 
 - 核心為**單一房間**（`Constants.DEFAULT_ROOM = "main"`）；多房間為未實作的延伸。
 - 暱稱**不防重複**（兩人同名仍可進，協定保留了 `ERROR` 型別供未來擴充）。
